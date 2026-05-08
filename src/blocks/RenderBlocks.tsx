@@ -7,6 +7,8 @@ import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import HomeHeroBlock from '@/blocks/home/HomeHero/Component'
+import HomePerformanceBlock from '@/blocks/home/HomePerformance/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -14,6 +16,8 @@ const blockComponents = {
   cta: CallToActionBlock,
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
+  'home-hero': HomeHeroBlock,
+  'home-performance': HomePerformanceBlock,
 }
 
 export const RenderBlocks: React.FC<{
