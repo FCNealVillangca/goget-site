@@ -1,7 +1,16 @@
 import React from 'react'
 
-const HomeSteps = () => {
-  const steps = [
+type Props = {
+  className?: string
+  heading?: string
+  subheading?: string
+  steps?: Array<{ title: string; description: string }>
+}
+
+const HomeSteps: React.FC<Props> = ({
+  heading = 'Our Simple Process',
+  subheading = 'Start your French learning journey with our structured, beginner-friendly approach that builds confidence step by step.',
+  steps = [
     {
       title: 'Assess Your Level',
       description: 'Take our quick assessment to determine your current French proficiency and learning goals.',
@@ -18,18 +27,19 @@ const HomeSteps = () => {
       title: 'Practice & Support',
       description: 'Practice with interactive exercises and get support from our friendly team.',
     },
-  ]
-
+  ],
+  className
+}) => {
   return (
-    <section className="relative w-full bg-white py-20">
+    <section className={`relative w-full bg-white py-20 ${className || ''}`}>
       <div className="max-w-7xl px-6 mx-auto">
         <div className="text-center mb-12 md:mb-16">
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-[#001750] mb-6">
-            Our Simple Process
+            {heading}
           </h1>
           <div className="relative py-1 max-w-2xl mx-auto text-slate-500">
             <p className="text-sm md:text-base">
-              Start your French learning journey with our structured, beginner-friendly approach that builds confidence step by step.
+              {subheading}
             </p>
           </div>
         </div>

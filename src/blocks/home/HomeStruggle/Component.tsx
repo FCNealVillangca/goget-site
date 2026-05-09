@@ -3,46 +3,33 @@
 import React, { useState } from 'react'
 import { Globe, Package, Truck, BarChart3 } from 'lucide-react'
 
-const services = [
-  {
-    id: 1,
-    title: 'E-commerce Fulfillment',
-    description:
-      'Fast and reliable order fulfillment services designed for online retailers, ensuring timely delivery and customer satisfaction.',
-    icon: Package,
-    image:
-      'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=800&auto=format&fit=crop',
-  },
-  {
-    id: 2,
-    title: 'Freight Forwarding',
-    description:
-      'International freight forwarding with customs clearance, documentation, and door-to-door delivery solutions.',
-    icon: Truck,
-    image:
-      'https://images.unsplash.com/photo-1580674285054-bed31e145f59?q=80&w=800&auto=format&fit=crop',
-  },
-  {
-    id: 3,
-    title: 'Supply Chain Management',
-    description:
-      'From freight forwarding & customs brokerage to warehousing solutions and supply chain management, our expertise ensures that your logistics operations are seamless and efficient.',
-    icon: Globe,
-    image:
-      'https://images.unsplash.com/photo-1494412519320-aa613dfb7738?q=80&w=800&auto=format&fit=crop',
-  },
-  {
-    id: 4,
-    title: 'Warehouse Solutions',
-    description:
-      'State-of-the-art warehouse facilities with inventory management, order processing, and distribution center services.',
-    icon: BarChart3,
-    image:
-      'https://images.unsplash.com/photo-1587293852726-70cdb56c2866?q=80&w=800&auto=format&fit=crop',
-  },
-]
+type Service = {
+  title: string
+  description: string
+  icon: 'globe' | 'package' | 'truck' | 'barchart3'
+  image: { url: string } | string
+}
 
-const HomeStruggle: React.FC = () => {
+type Props = {
+  className?: string
+  heading?: string
+  subheading?: string
+  services?: Service[]
+}
+
+const iconMap = {
+  globe: Globe,
+  package: Package,
+  truck: Truck,
+  barchart3: BarChart3,
+}
+
+const HomeStruggle: React.FC<Props> = ({
+  heading = 'Why you are struggling with French',
+  subheading = 'Our state-of-the-art facilities and innovative technology support e-commerce fulfillment and project cargo handling.',
+  services = [],
+  className
+}) => {
   const [activeCard, setActiveCard] = useState(2)
   const [clickedCard, setClickedCard] = useState<number | null>(null)
 
@@ -62,12 +49,11 @@ const HomeStruggle: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-[#001750] mb-6">
-            Why you are struggling with French
+            {heading}
           </h1>
           <div className="relative py-1 max-w-2xl mx-auto text-slate-500">
             <p className="text-sm md:text-base">
-              Our state-of-the-art facilities and innovative technology support e-commerce
-              fulfillment and project cargo handling.
+              {subheading}
             </p>
           </div>
         </div>
@@ -75,12 +61,13 @@ const HomeStruggle: React.FC = () => {
         {/* Cards Container */}
         <div className="flex flex-col md:flex-row items-stretch justify-center gap-4 md:gap-6 pb-8 w-full">
           {services.map((service, index) => {
-            const Icon = service.icon
+            const Icon = iconMap[service.icon] || Package
+            const imageUrl = typeof service.image === 'string' ? service.image : service.image?.url || ''
             const isActive = activeCard === index
 
             return (
               <div
-                key={service.id}
+                key={index}
                 onMouseEnter={() => {
                   if (window.innerWidth >= 768) setActiveCard(index)
                 }}
@@ -108,7 +95,7 @@ const HomeStruggle: React.FC = () => {
                 ) : (
                   <div className="relative w-full h-full">
                     <img
-                      src={service.image}
+                      src={imageUrl}
                       alt={service.title}
                       className="w-full h-full object-cover"
                     />

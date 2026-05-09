@@ -189,10 +189,7 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
 }) => {
   return {
     slug: 'home',
-    _status: 'published',
-    hero: {
-      // ... existing hero config
-    },
+    // Note: No _status needed since collection has drafts: false
     layout: [
       {
         blockType: 'home-hero',
@@ -205,22 +202,35 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
       // Add other blocks here as needed
     ],
     meta: {
-      // ... existing meta config
+      description: 'An open-source website built with Payload and Next.js.',
+      image: heroImage?.id,
+      title: 'Payload Website Template',
     },
     title: 'Home',
   }
 }
 ```
 
-**Note:** The home page is now seeded in the database instead of using static fallback data. After seeding, you'll have a "home" page in your Pages collection that you can edit through the admin panel.
+**Important Notes:**
+- Since the Pages collection has `drafts: false`, do not include `_status` in the seed data.
+- The seeding process requires authentication. Log into the admin panel and visit `/next/seed` to populate the database.
+- After seeding, the home page will be in the Pages collection and editable through the admin panel.
+- Always run `npm run generate:types` after adding new blocks to update TypeScript definitions.
 
-## Step 6: Run Type Generation
+## Step 6: Run Type Generation and Checks
 
-After making these changes, regenerate the TypeScript types:
+After making these changes:
 
-```bash
-npm run generate:types
-```
+1. Regenerate the TypeScript types:
+   ```bash
+   npm run generate:types
+   ```
+
+2. Run linting and type checking to ensure no errors:
+   ```bash
+   npm run lint
+   npm run typecheck  # If available, otherwise skip
+   ```
 
 The block is now reusable and content-editable through the Payload admin panel!</content>
 <parameter name="filePath">HomeHero-Block-Instructions.md

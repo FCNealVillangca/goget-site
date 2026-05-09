@@ -1,56 +1,44 @@
-'use client'
-
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import ReviewCard from '../ReviewCard'
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
+import type { Review } from '@/payload-types'
 
-interface Review {
-  id: string
-  name: string
-  role: string
-  rating: number
-  message: string
-  avatar?: { url: string }
-  video?: { url: string }
-  thumbnail?: { url: string }
-  isMain?: boolean
+type Props = {
+  heading?: string
+  limit?: number | null
+  id?: string
 }
 
-const ResultList = () => {
-  const [reviews, setReviews] = useState<Review[]>([])
-  const [loading, setLoading] = useState(true)
+export const ResultListBlock: React.FC<Props> = async ({
+  heading = 'Student Results',
+  limit = 12,
+  id,
+}) => {
+  const payload = await getPayload({ config: configPromise })
 
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await fetch('/api/reviews')
-        const data = await response.json()
-        setReviews(data.docs || [])
-      } catch (error) {
-        console.error('Error fetching reviews:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchReviews()
-  }, [])
+  const { docs: rawReviews } = await payload.find({
+    collection: 'reviews',
+    limit: limit || 12,
+  })
 
-  const mappedReviews = reviews.map((review) => ({
+  const mappedReviews = rawReviews.map((review: any) => ({
     ...review,
     content: review.message,
-    image: review.avatar?.url,
-    thumbnail: review.thumbnail?.url,
+    image: review.avatar?.url || (typeof review.avatar === 'string' ? review.avatar : null),
+    thumbnail: review.thumbnail?.url || (typeof review.thumbnail === 'string' ? review.thumbnail : null),
   }))
 
-  if (loading) {
-    return <div className="py-24 text-center">Loading...</div>
+  if (!mappedReviews.length) {
+    return <div className="py-24 text-center">No student results found.</div>
   }
 
   return (
-    <section className="w-full py-16 md:py-24">
+    <section className="w-full py-16 md:py-24" id={`block-${id}`}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-6xl font-black text-primary tracking-tighter">
-            Student Results
+            {heading}
           </h2>
         </div>
 
@@ -64,4 +52,4 @@ const ResultList = () => {
   )
 }
 
-export default ResultList
+export default ResultListBlock

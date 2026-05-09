@@ -72,6 +72,8 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    reviews: Review;
+    faqs: Faq;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -94,6 +96,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -166,6 +170,17 @@ export interface Page {
     | FormBlock
     | HomeHeroBlock
     | HomePerformanceBlock
+    | HomeStepsBlock
+    | HomeStruggleBlock
+    | HomeTestimonialBlock
+    | AboutTutorBlock
+    | AboutStruggleBlock
+    | AboutDirectivesBlock
+    | ResultListBlock
+    | SupportHeroBlock
+    | SupportCoursesBlock
+    | FaqListBlock
+    | FaqContactBlock
   )[];
   meta?: {
     title?: string | null;
@@ -837,6 +852,199 @@ export interface HomePerformanceBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HomeStepsBlock".
+ */
+export interface HomeStepsBlock {
+  heading: string;
+  subheading: string;
+  steps: {
+    title: string;
+    description: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'home-steps';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HomeStruggleBlock".
+ */
+export interface HomeStruggleBlock {
+  heading: string;
+  subheading: string;
+  services: {
+    title: string;
+    description: string;
+    icon: 'globe' | 'package' | 'truck' | 'barchart3';
+    image: number | Media;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'home-struggle';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HomeTestimonialBlock".
+ */
+export interface HomeTestimonialBlock {
+  heading: string;
+  description: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'home-testimonial';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AboutTutorBlock".
+ */
+export interface AboutTutorBlock {
+  heading: string;
+  paragraphs: {
+    text: string;
+    id?: string | null;
+  }[];
+  highlightText: string;
+  points: {
+    text: string;
+    id?: string | null;
+  }[];
+  image?: (number | null) | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'about-tutor';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AboutStruggleBlock".
+ */
+export interface AboutStruggleBlock {
+  heading: string;
+  introParagraph: string;
+  mainParagraph: string;
+  images: {
+    image: number | Media;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'about-struggle';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AboutDirectivesBlock".
+ */
+export interface AboutDirectivesBlock {
+  heading: string;
+  missionTitle: string;
+  missionText: string;
+  visionTitle: string;
+  visionText: string;
+  goalTitle: string;
+  goalText: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'about-directives';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ResultListBlock".
+ */
+export interface ResultListBlock {
+  heading: string;
+  /**
+   * Maximum number of results to show
+   */
+  limit?: number | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'result-list';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SupportHeroBlock".
+ */
+export interface SupportHeroBlock {
+  heading: string;
+  description: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'support-hero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SupportCoursesBlock".
+ */
+export interface SupportCoursesBlock {
+  heading: string;
+  steps: {
+    number: string;
+    title: string;
+    description: string;
+    image: number | Media;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'support-courses';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqListBlock".
+ */
+export interface FaqListBlock {
+  heading: string;
+  description: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq-list';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqContactBlock".
+ */
+export interface FaqContactBlock {
+  heading: string;
+  description: string;
+  form: number | Form;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq-contact';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  name: string;
+  role: string;
+  rating: number;
+  message: string;
+  avatar?: (number | null) | Media;
+  video?: (number | null) | Media;
+  thumbnail?: (number | null) | Media;
+  /**
+   * Set to true to feature this review prominently as the main testimonial.
+   */
+  isMain?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1046,6 +1254,14 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'reviews';
+        value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -1123,6 +1339,17 @@ export interface PagesSelect<T extends boolean = true> {
         formBlock?: T | FormBlockSelect<T>;
         'home-hero'?: T | HomeHeroBlockSelect<T>;
         'home-performance'?: T | HomePerformanceBlockSelect<T>;
+        'home-steps'?: T | HomeStepsBlockSelect<T>;
+        'home-struggle'?: T | HomeStruggleBlockSelect<T>;
+        'home-testimonial'?: T | HomeTestimonialBlockSelect<T>;
+        'about-tutor'?: T | AboutTutorBlockSelect<T>;
+        'about-struggle'?: T | AboutStruggleBlockSelect<T>;
+        'about-directives'?: T | AboutDirectivesBlockSelect<T>;
+        'result-list'?: T | ResultListBlockSelect<T>;
+        'support-hero'?: T | SupportHeroBlockSelect<T>;
+        'support-courses'?: T | SupportCoursesBlockSelect<T>;
+        'faq-list'?: T | FaqListBlockSelect<T>;
+        'faq-contact'?: T | FaqContactBlockSelect<T>;
       };
   meta?:
     | T
@@ -1248,6 +1475,166 @@ export interface HomePerformanceBlockSelect<T extends boolean = true> {
         content?: T;
         id?: T;
       };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HomeStepsBlock_select".
+ */
+export interface HomeStepsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  subheading?: T;
+  steps?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HomeStruggleBlock_select".
+ */
+export interface HomeStruggleBlockSelect<T extends boolean = true> {
+  heading?: T;
+  subheading?: T;
+  services?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        icon?: T;
+        image?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HomeTestimonialBlock_select".
+ */
+export interface HomeTestimonialBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AboutTutorBlock_select".
+ */
+export interface AboutTutorBlockSelect<T extends boolean = true> {
+  heading?: T;
+  paragraphs?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  highlightText?: T;
+  points?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  image?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AboutStruggleBlock_select".
+ */
+export interface AboutStruggleBlockSelect<T extends boolean = true> {
+  heading?: T;
+  introParagraph?: T;
+  mainParagraph?: T;
+  images?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AboutDirectivesBlock_select".
+ */
+export interface AboutDirectivesBlockSelect<T extends boolean = true> {
+  heading?: T;
+  missionTitle?: T;
+  missionText?: T;
+  visionTitle?: T;
+  visionText?: T;
+  goalTitle?: T;
+  goalText?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ResultListBlock_select".
+ */
+export interface ResultListBlockSelect<T extends boolean = true> {
+  heading?: T;
+  limit?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SupportHeroBlock_select".
+ */
+export interface SupportHeroBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SupportCoursesBlock_select".
+ */
+export interface SupportCoursesBlockSelect<T extends boolean = true> {
+  heading?: T;
+  steps?:
+    | T
+    | {
+        number?: T;
+        title?: T;
+        description?: T;
+        image?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqListBlock_select".
+ */
+export interface FaqListBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqContactBlock_select".
+ */
+export interface FaqContactBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  form?: T;
   id?: T;
   blockName?: T;
 }
@@ -1436,6 +1823,32 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  rating?: T;
+  message?: T;
+  avatar?: T;
+  video?: T;
+  thumbnail?: T;
+  isMain?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

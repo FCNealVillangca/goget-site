@@ -9,6 +9,17 @@ import { FormBlock } from '../../blocks/Form/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { HomeHero } from '../../blocks/home/HomeHero/config'
 import { HomePerformance } from '../../blocks/home/HomePerformance/config'
+import { HomeSteps } from '../../blocks/home/HomeSteps/config'
+import { HomeStruggle } from '../../blocks/home/HomeStruggle/config'
+import { HomeTestimonial } from '../../blocks/home/HomeTestimonial/config'
+import { AboutTutor } from '../../blocks/about/AboutTutor/config'
+import { AboutStruggle } from '../../blocks/about/AboutStruggle/config'
+import { AboutDirectives } from '../../blocks/about/AboutDirectives/config'
+import { ResultList } from '../../blocks/result/ResultList/config'
+import { SupportHero } from '../../blocks/support/SupportHero/config'
+import { SupportCourses } from '../../blocks/support/SupportCourses/config'
+import { FaqList } from '../../blocks/faq/FaqList/config'
+import { FaqContact } from '../../blocks/faq/FaqContact/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
@@ -27,7 +38,7 @@ export const Pages: CollectionConfig<'pages'> = {
   access: {
     create: authenticated,
     delete: authenticated,
-    read: authenticatedOrPublished,
+    read: () => true,
     update: authenticated,
   },
   // This config controls what's populated by default when a page is referenced
@@ -69,7 +80,7 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock, HomeHero, HomePerformance],
+              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock, HomeHero, HomePerformance, HomeSteps, HomeStruggle, HomeTestimonial, AboutTutor, AboutStruggle, AboutDirectives, ResultList, SupportHero, SupportCourses, FaqList, FaqContact],
               required: true,
               admin: {
                 initCollapsed: true,

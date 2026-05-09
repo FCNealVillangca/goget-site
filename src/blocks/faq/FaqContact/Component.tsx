@@ -1,8 +1,8 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import dynamic from 'next/dynamic'
-
 import { toast } from 'sonner'
+import type { Form } from '@/payload-types'
 
 // Dynamically import the map component with no SSR
 const DynamicMap = dynamic(() => import('./MapComponent'), {
@@ -14,26 +14,24 @@ const DynamicMap = dynamic(() => import('./MapComponent'), {
   ),
 })
 
-export default function FaqContact() {
-  const [formId, setFormId] = useState<string | null>(null)
+type Props = {
+  heading?: string
+  description?: string
+  form?: Form | number | string | null
+  id?: string
+}
+
+export default function FaqContactBlock({
+  heading = 'Get in touch.',
+  description = "Have questions? Send us a message and we'll get back to you shortly.",
+  form,
+  id,
+}: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Fetch the form ID by title on mount
-  useEffect(() => {
-    const fetchForm = async () => {
-      try {
-        const response = await fetch('/api/forms?where[title][equals]=Contact Form')
-        const data = await response.json()
-        if (data.docs && data.docs.length > 0) {
-          setFormId(data.docs[0].id)
-        }
-      } catch (err) {
-        console.error('Error fetching form:', err)
-      }
-    }
-    fetchForm()
-  }, [])
+  // Extract form ID whether it's populated or just a relation ID
+  const formId = typeof form === 'object' && form !== null ? form.id : form
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -83,7 +81,7 @@ export default function FaqContact() {
   }
 
   return (
-    <section className="relative w-full bg-white py-24 px-6">
+    <section className="relative w-full bg-white py-24 px-6" id={`block-${id}`}>
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Left Side: Real Leaflet Map */}
@@ -97,11 +95,9 @@ export default function FaqContact() {
           <div className="flex flex-col gap-8">
             <div>
               <h2 className="text-5xl font-extrabold text-[#001750] tracking-tight mb-4">
-                Get in touch.
+                {heading}
               </h2>
-              <p className="text-lg text-slate-500">
-                Have questions? Send us a message and we'll get back to you shortly.
-              </p>
+              <p className="text-lg text-slate-500">{description}</p>
             </div>
 
             <form className="grid gap-4" onSubmit={handleSubmit}>
@@ -137,9 +133,9 @@ export default function FaqContact() {
                 required
                 className="min-h-30 w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none focus:ring-2 focus:ring-[#001750] transition-all resize-none"
               ></textarea>
-              
+
               {error && <p className="text-red-500 text-sm">{error}</p>}
-              
+
               <button
                 type="submit"
                 disabled={loading || !formId}

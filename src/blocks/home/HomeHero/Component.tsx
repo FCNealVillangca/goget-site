@@ -15,12 +15,12 @@ const HomeHero: React.FC<Props> = ({
   heading = 'French for complete beginners',
   subheading = 'Start speaking French with calm, clear lessons that make sense from day one.',
   description = 'No pressure. No confusion. Just structured support to help you build confidence step by step.',
-  backgroundImage = '/assets/landingpagebanner.jpg',
+  backgroundImage = 'https://images.unsplash.com/photo-1499566727022-8ccb1bf82098?w=1600&q=80',
   ctaText = 'Book your free assessment',
   ctaUrl = 'https://goget-french.breely.com/form/12099',
   className
 }) => {
-  const imageUrl = typeof backgroundImage === 'string' ? backgroundImage : backgroundImage?.url || '/assets/landingpagebanner.jpg'
+  const imageUrl = typeof backgroundImage === 'string' ? backgroundImage : backgroundImage?.url || 'https://images.unsplash.com/photo-1499566727022-8ccb1bf82098?w=1600&q=80'
 
   return (
     <section className={`relative w-full bg-white min-h-150 flex items-center overflow-hidden ${className || ''}`}>

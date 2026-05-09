@@ -108,7 +108,7 @@ const HomePerformance: React.FC<Props> = ({
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {features.map((f, i) => {
-              const IconComponent = iconMap[f.icon]
+              const IconComponent = iconMap[f.icon] || Star
               return (
                 <div key={i} className="flex gap-4">
                   <div className="shrink-0 w-12 h-12 rounded-full bg-[#001750] flex items-center justify-center text-white">
