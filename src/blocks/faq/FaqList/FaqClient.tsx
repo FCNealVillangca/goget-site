@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Search, HelpCircle } from 'lucide-react'
 import { useDebounce } from '@/utilities/useDebounce'
 import {
@@ -17,36 +17,42 @@ type FaqItem = {
 }
 
 type Props = {
-  initialFaqs: FaqItem[]
   heading: string
   description: string
 }
 
-export const FaqClient: React.FC<Props> = ({ initialFaqs, heading, description }) => {
+export const FaqClient: React.FC<Props> = ({ heading, description }) => {
+  const [faqs, setFaqs] = useState<FaqItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
 
-  const filteredFaqs = useMemo(() => {
-    if (!debouncedSearchTerm) return initialFaqs
-    const term = debouncedSearchTerm.toLowerCase()
-    return initialFaqs.filter(
-      (faq) =>
-        faq.question.toLowerCase().includes(term) || faq.answer.toLowerCase().includes(term)
-    )
-  }, [debouncedSearchTerm, initialFaqs])
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      setLoading(true)
+      try {
+        const response = await fetch(`/api/faqs${debouncedSearchTerm ? `?q=${encodeURIComponent(debouncedSearchTerm)}` : ''}`)
+        const data = await response.json()
+        setFaqs(data.faqs)
+      } catch (error) {
+        console.error('Failed to fetch FAQs:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchFaqs()
+  }, [debouncedSearchTerm])
 
   return (
-    <section className="relative w-full bg-white text-foreground overflow-hidden">
+    <section className="relative w-full text-foreground overflow-hidden">
       <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="max-w-4xl relative z-10 py-24 px-6 mx-auto">
+      <div className="max-w-7xl relative z-10 py-24 px-6 mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-[#001750] mb-6">
             {heading}
           </h1>
-          <p className="text-slate-500 text-lg max-w-2xl mx-auto mb-10">
-            {description}
-          </p>
+          <p className="text-slate-500 text-lg max-w-2xl mx-auto mb-10">{description}</p>
 
           <div className="relative max-w-xl mx-auto group">
             <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
@@ -62,9 +68,13 @@ export const FaqClient: React.FC<Props> = ({ initialFaqs, heading, description }
           </div>
         </div>
 
-        {filteredFaqs.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-20">
+            <p className="text-slate-500">Loading FAQs...</p>
+          </div>
+        ) : faqs.length > 0 ? (
           <Accordion type="single" collapsible className="w-full space-y-4">
-            {filteredFaqs.map((faq, index) => (
+            {faqs.map((faq, index) => (
               <AccordionItem
                 key={faq.id || index}
                 value={`item-${index}`}

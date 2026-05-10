@@ -6,7 +6,8 @@ import { support } from './support'
 import { faq } from './faq'
 import { posts } from './posts'
 
-const collections: CollectionSlug[] = ['pages', 'posts', 'reviews', 'faqs', 'media', 'forms']
+
+const collections: CollectionSlug[] = ['pages', 'posts', 'reviews', 'faqs', 'media', 'forms', 'search']
 
 export const seed = async ({
   payload,
@@ -438,13 +439,37 @@ export const seed = async ({
       adminId,
     })
 
+    const createdPosts = []
     for (const post of samplePosts) {
-      await payload.create({
+      const createdPost = await payload.create({
         collection: 'posts',
         data: post,
       })
+      createdPosts.push(createdPost)
     }
     payload.logger.info('Sample posts created successfully')
+
+    // Sync posts to search collection
+    payload.logger.info('Syncing posts to search collection...')
+    for (const post of createdPosts) {
+      try {
+        await payload.create({
+          collection: 'search',
+          data: {
+            title: post.title,
+            slug: post.slug,
+            doc: {
+              relationTo: 'posts',
+              value: post.id,
+            },
+            meta: post.meta,
+          },
+        })
+      } catch (e) {
+        payload.logger.error(`Error syncing post ${post.id} to search: ${e instanceof Error ? e.message : String(e)}`)
+      }
+    }
+    payload.logger.info('Posts synced to search collection successfully')
 
     // 7. UPDATE HEADER
     payload.logger.info('— Updating header navigation...')
@@ -455,6 +480,7 @@ export const seed = async ({
     if (resultsDocRecord) navItems.push({ link: { type: 'reference' as const, reference: { relationTo: 'pages' as const, value: resultsDocRecord.id as number }, label: 'Results' } })
     if (supportDocRecord) navItems.push({ link: { type: 'reference' as const, reference: { relationTo: 'pages' as const, value: supportDocRecord.id as number }, label: 'Support' } })
     if (faqDocRecord) navItems.push({ link: { type: 'reference' as const, reference: { relationTo: 'pages' as const, value: faqDocRecord.id as number }, label: 'FAQ' } })
+    navItems.push({ link: { type: 'custom' as const, url: '/posts', label: 'Blog' } })
 
     try {
       await payload.updateGlobal({

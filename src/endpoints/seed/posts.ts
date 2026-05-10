@@ -14,6 +14,7 @@ export const posts: (args: PostsArgs) => RequiredDataFromCollectionSlug<'posts'>
 }) => {
   return [
     {
+      _status: 'published',
       title: 'Getting Started with French Pronunciation',
       slug: 'getting-started-with-french-pronunciation',
       content: {
@@ -83,6 +84,7 @@ export const posts: (args: PostsArgs) => RequiredDataFromCollectionSlug<'posts'>
       },
     },
     {
+      _status: 'published',
       title: 'Essential French Vocabulary for Travelers',
       slug: 'essential-french-vocabulary-for-travelers',
       content: {
@@ -175,6 +177,7 @@ export const posts: (args: PostsArgs) => RequiredDataFromCollectionSlug<'posts'>
       },
     },
     {
+      _status: 'published',
       title: 'Understanding French Grammar: Verbs',
       slug: 'understanding-french-grammar-verbs',
       content: {

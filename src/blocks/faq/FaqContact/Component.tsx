@@ -81,8 +81,8 @@ export default function FaqContactBlock({
   }
 
   return (
-    <section className="relative w-full bg-white py-24 px-6" id={`block-${id}`}>
-      <div className="max-w-7xl mx-auto">
+    <section className="relative w-full bg-white py-24" id={`block-${id}`}>
+      <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Left Side: Real Leaflet Map */}
           <div className="w-full">
