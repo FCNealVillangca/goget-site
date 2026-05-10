@@ -38,8 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html className={cn(inter.variable, 'scroll-smooth')} lang="en" data-theme="light">
       <head>
-        <link href="/favicon.ico" rel="icon" sizes="32x32" />
-        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        <link href="/logo.png" rel="icon" type="image/png" />
       </head>
       {/* flex flex-col min-h-screen ensures the footer stays at the bottom */}
       <body className="min-h-screen flex flex-col bg-white antialiased">

@@ -30,7 +30,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
         {/* Logo */}
         <div className="flex items-center">
           <Link href="/">
-            <Logo loading="eager" priority="high" className="h-14 w-auto object-contain" />
+            <Logo loading="eager" priority="high" className="h-12 w-auto object-contain" />
           </Link>
         </div>
 

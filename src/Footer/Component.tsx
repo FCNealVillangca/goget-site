@@ -19,8 +19,8 @@ export async function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Section */}
           <div className="space-y-6">
-            <div className="relative w-48 h-16">
-              <Logo className="h-16 w-auto object-contain object-left" />
+            <div className="relative w-48">
+              <Logo className="h-20 w-auto object-contain object-left" />
             </div>
             <p className="text-slate-500 text-sm leading-relaxed max-w-xs font-medium">
               Structured French learning focused on speaking, clarity, and exam performance.
