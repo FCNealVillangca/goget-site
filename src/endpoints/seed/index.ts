@@ -4,8 +4,9 @@ import { about } from './about'
 import { results } from './results'
 import { support } from './support'
 import { faq } from './faq'
+import { posts } from './posts'
 
-const collections: CollectionSlug[] = ['pages', 'reviews', 'faqs', 'media']
+const collections: CollectionSlug[] = ['pages', 'posts', 'reviews', 'faqs', 'media', 'forms']
 
 export const seed = async ({
   payload,
@@ -132,17 +133,200 @@ export const seed = async ({
       payload.logger.info('Skipping due to error')
     }
 
-    payload.logger.info('— Finding contact form...')
-    let contactFormId: number = 1
-    const forms = await payload.find({
+    // 6. SEED FORMS
+    payload.logger.info('— Creating forms...')
+
+    // Contact Form
+    const contactForm = await payload.create({
       collection: 'forms',
-      where: { title: { equals: 'Contact Form' } },
-      limit: 1,
+      data: {
+        title: 'Contact Form',
+        fields: [
+          {
+            blockType: 'text',
+            name: 'full-name',
+            label: 'Full Name',
+            required: true,
+          },
+          {
+            blockType: 'email',
+            name: 'email',
+            label: 'Email',
+            required: true,
+          },
+          {
+            blockType: 'text',
+            name: 'mobile-number',
+            label: 'Mobile Number',
+          },
+          {
+            blockType: 'text',
+            name: 'subject',
+            label: 'Subject',
+            required: true,
+          },
+          {
+            blockType: 'textarea',
+            name: 'message',
+            label: 'Message',
+            required: true,
+          },
+        ],
+        confirmationType: 'message',
+        confirmationMessage: {
+          root: {
+            type: 'root',
+            children: [
+              {
+                type: 'paragraph',
+                children: [
+                  {
+                    type: 'text',
+                    text: 'Thank you for contacting us. We will get back to you soon.',
+                    version: 1,
+                  },
+                ],
+                version: 1,
+              },
+            ],
+            direction: 'ltr',
+            format: '',
+            indent: 0,
+            version: 1,
+          },
+        },
+        emails: [
+          {
+            emailTo: '{{email}}',
+            subject: '[Auto-reply] Thank you for contacting us',
+            message: {
+              root: {
+                type: 'root',
+                children: [
+                  {
+                    type: 'paragraph',
+                    children: [
+                      {
+                        type: 'text',
+                        text: 'Thank you for contacting us. We will get back to you soon.',
+                        version: 1,
+                      },
+                    ],
+                    version: 1,
+                  },
+                ],
+                direction: 'ltr',
+                format: '',
+                indent: 0,
+                version: 1,
+              },
+            },
+          },
+          {
+            emailTo: 'admin@test.com',
+            subject: '[Notification] New contact form submission',
+            message: {
+              root: {
+                type: 'root',
+                children: [
+                  {
+                    type: 'paragraph',
+                    children: [
+                      {
+                        type: 'text',
+                        text: 'New contact form submission from {{full-name}} ({{email}}): {{message}}',
+                        version: 1,
+                      },
+                    ],
+                    version: 1,
+                  },
+                ],
+                direction: 'ltr',
+                format: '',
+                indent: 0,
+                version: 1,
+              },
+            },
+          },
+        ],
+      },
     })
-    
-    if (forms.docs.length > 0) {
-      contactFormId = forms.docs[0].id as number
-    }
+
+    const contactFormId = contactForm.id as number
+
+    // Newsletter Form
+    const newsletterForm = await payload.create({
+      collection: 'forms',
+      data: {
+        title: 'Newsletter Signup',
+        fields: [
+          {
+            blockType: 'email',
+            name: 'email',
+            label: 'Email',
+            required: true,
+          },
+          {
+            blockType: 'text',
+            name: 'name',
+            label: 'Name (Optional)',
+          },
+        ],
+        confirmationType: 'message',
+        confirmationMessage: {
+          root: {
+            type: 'root',
+            children: [
+              {
+                type: 'paragraph',
+                children: [
+                  {
+                    type: 'text',
+                    text: 'Thank you for subscribing to our newsletter!',
+                    version: 1,
+                  },
+                ],
+                version: 1,
+              },
+            ],
+            direction: 'ltr',
+            format: '',
+            indent: 0,
+            version: 1,
+          },
+        },
+        emails: [
+          {
+            emailTo: '{{email}}',
+            subject: '[Auto-reply] Thank you for subscribing',
+            message: {
+              root: {
+                type: 'root',
+                children: [
+                  {
+                    type: 'paragraph',
+                    children: [
+                      {
+                        type: 'text',
+                        text: 'Thank you for subscribing to our newsletter. Stay tuned for updates!',
+                        version: 1,
+                      },
+                    ],
+                    version: 1,
+                  },
+                ],
+                direction: 'ltr',
+                format: '',
+                indent: 0,
+                version: 1,
+              },
+            },
+          },
+        ],
+      },
+    })
+
+    payload.logger.info('Forms created successfully')
 
     let faqDocRecord
     try {
@@ -234,7 +418,35 @@ export const seed = async ({
     }
     payload.logger.info('Sample reviews created successfully')
 
-    // 5. UPDATE HEADER
+    // 5. SEED POSTS
+    payload.logger.info('— Finding admin user for posts...')
+    const adminUser = await payload.find({
+      collection: 'users',
+      where: { email: { equals: 'admin@test.com' } },
+      limit: 1,
+    })
+
+    let adminId: number | undefined
+    if (adminUser.docs.length > 0) {
+      adminId = adminUser.docs[0].id as number
+    }
+
+    payload.logger.info('— Creating sample posts...')
+    const samplePosts = posts({
+      heroImage: heroDoc,
+      metaImage: heroDoc,
+      adminId,
+    })
+
+    for (const post of samplePosts) {
+      await payload.create({
+        collection: 'posts',
+        data: post,
+      })
+    }
+    payload.logger.info('Sample posts created successfully')
+
+    // 7. UPDATE HEADER
     payload.logger.info('— Updating header navigation...')
     const navItems = []
     
