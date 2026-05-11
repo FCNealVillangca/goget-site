@@ -47,7 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header />
 
           {/* MAIN: Padded top to account for fixed header */}
-          <main className="grow pt-18.5">{children}</main>
+          <main className="grow pt-20">{children}</main>
 
           <Footer />
 
