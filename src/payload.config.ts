@@ -11,6 +11,7 @@ import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Reviews } from './collections/Reviews'
 import { Faqs } from './collections/Faqs'
+import { Newsletter } from './collections/Newsletter'
 import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
@@ -41,12 +42,12 @@ export default buildConfig({
   },
   editor: defaultLexical,
   db: sqliteAdapter({
-    push: false,
+    push: true,
     client: {
       url: process.env.DATABASE_URL || 'file:./db.sqlite',
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Reviews, Faqs],
+  collections: [Pages, Posts, Media, Categories, Users, Reviews, Faqs, Newsletter],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
 

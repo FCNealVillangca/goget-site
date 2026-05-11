@@ -474,12 +474,13 @@ export const seed = async ({
     // 7. UPDATE HEADER
     payload.logger.info('— Updating header navigation...')
     const navItems = []
-    
+
+    // Add navigation items in logical order
     if (homeDocRecord) navItems.push({ link: { type: 'reference' as const, reference: { relationTo: 'pages' as const, value: homeDocRecord.id as number }, label: 'Home' } })
-    if (aboutDocRecord) navItems.push({ link: { type: 'reference' as const, reference: { relationTo: 'pages' as const, value: aboutDocRecord.id as number }, label: 'About' } })
+    if (aboutDocRecord) navItems.push({ link: { type: 'reference' as const, reference: { relationTo: 'pages' as const, value: aboutDocRecord.id as number }, label: 'About Us' } })
     if (resultsDocRecord) navItems.push({ link: { type: 'reference' as const, reference: { relationTo: 'pages' as const, value: resultsDocRecord.id as number }, label: 'Results' } })
-    if (supportDocRecord) navItems.push({ link: { type: 'reference' as const, reference: { relationTo: 'pages' as const, value: supportDocRecord.id as number }, label: 'Support' } })
     if (faqDocRecord) navItems.push({ link: { type: 'reference' as const, reference: { relationTo: 'pages' as const, value: faqDocRecord.id as number }, label: 'FAQ' } })
+    if (supportDocRecord) navItems.push({ link: { type: 'reference' as const, reference: { relationTo: 'pages' as const, value: supportDocRecord.id as number }, label: 'Support' } })
     navItems.push({ link: { type: 'custom' as const, url: '/posts', label: 'Blog' } })
 
     try {
