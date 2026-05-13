@@ -23,23 +23,28 @@ export const Media: CollectionConfig = {
     read: anyone,
     update: authenticated,
   },
+  upload: {
+    disableLocalStorage: true,
+    adminThumbnail: ({ doc }) => {
+      // Use Cloudinary URL for thumbnails
+      if (doc?.filename) {
+        return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/w_150,h_150,c_fill,q_auto,f_auto/media/${doc.filename}.jpg`
+      }
+      return null
+    },
+  },
   admin: {
     components: {
-      // Override the default upload field with custom client-side upload
+      // Override the upload field component
       edit: {
         Upload: '@/components/CustomUpload',
       },
     },
   },
-  upload: {
-    // Disable server-side processing since we handle uploads client-side
-    disableLocalStorage: true,
-  },
   fields: [
     {
       name: 'alt',
       type: 'text',
-      //required: true,
     },
     {
       name: 'caption',

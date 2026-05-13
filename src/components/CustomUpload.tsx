@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react'
 import { useField, toast } from '@payloadcms/ui'
 
 const CustomUploadField: React.FC<any> = (props) => {
-  const { value, setValue } = useField<string>({ path: props.path })
   const [uploading, setUploading] = useState(false)
 
   const handleFileSelect = useCallback(async (files: FileList | null) => {
@@ -12,14 +11,13 @@ const CustomUploadField: React.FC<any> = (props) => {
     setUploading(true)
 
     try {
-      // Create form data for direct Cloudinary upload
+      // Upload directly to Cloudinary from client
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'default')
+      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'media_upload')
       formData.append('folder', 'media')
       formData.append('resource_type', 'auto')
 
-      // Upload directly to Cloudinary
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
         {
@@ -29,32 +27,36 @@ const CustomUploadField: React.FC<any> = (props) => {
       )
 
       if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`)
+        throw new Error(`Cloudinary upload failed: ${response.statusText}`)
       }
 
-      const result = await response.json()
+      const cloudinaryResult = await response.json()
 
-      // Create media document in Payload with Cloudinary data
-      const mediaResponse = await fetch('/api/media', {
+      // Now create the Payload media record with just metadata (no file data)
+      const payloadResponse = await fetch('/api/media', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          filename: result.public_id,
-          mimeType: `${result.resource_type}/${result.format}`,
-          filesize: result.bytes,
-          url: result.secure_url,
+          filename: cloudinaryResult.public_id,
+          mimeType: `${cloudinaryResult.resource_type}/${cloudinaryResult.format}`,
+          filesize: cloudinaryResult.bytes,
+          url: cloudinaryResult.secure_url,
           alt: file.name,
         }),
       })
 
-      if (!mediaResponse.ok) {
+      if (!payloadResponse.ok) {
         throw new Error('Failed to create media record')
       }
 
-      const mediaDoc = await mediaResponse.json()
-      setValue(mediaDoc.doc.id)
+      const payloadResult = await payloadResponse.json()
+
+      // Set the media ID in the form
+      if (props.onChange) {
+        props.onChange(payloadResult.doc.id)
+      }
 
       toast.success('File uploaded successfully')
     } catch (error: any) {
@@ -63,19 +65,18 @@ const CustomUploadField: React.FC<any> = (props) => {
     } finally {
       setUploading(false)
     }
-  }, [setValue])
+  }, [props])
 
   return (
     <div>
       <input
         type="file"
-        accept="video/*,image/*"
+        accept="video/*,image/*,audio/*"
         onChange={(e) => handleFileSelect(e.target.files)}
         disabled={uploading}
         style={{ marginBottom: '1rem' }}
       />
-      {uploading && <p>Uploading...</p>}
-      {value && <p>File uploaded successfully</p>}
+      {uploading && <p>Uploading directly to Cloudinary...</p>}
     </div>
   )
 }

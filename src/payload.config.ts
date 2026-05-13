@@ -40,6 +40,12 @@ const cloudinaryAdapter = () => ({
     req,
     clientUploadContext,
   }: Parameters<HandleUpload>[0]) {
+    // If filename already looks like a Cloudinary public_id (contains 'media/'), skip upload
+    if (file.filename && file.filename.includes('media/')) {
+      // File already uploaded to Cloudinary, just ensure URL generation works
+      return
+    }
+
     try {
       const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
@@ -123,7 +129,7 @@ export default buildConfig({
           adapter: cloudinaryAdapter,
           disableLocalStorage: true,
           generateFileURL: ({ filename }) => {
-            return cloudinary.url(`media/${filename}`, { secure: true })
+            return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/media/${filename}`
           },
         },
       },
