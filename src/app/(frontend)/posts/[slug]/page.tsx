@@ -69,7 +69,7 @@ export default async function Post({ params: paramsPromise }: Args) {
 
         {/* 3:2 Image - Fills the width of the 7xl container */}
         <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl mb-12">
-          {post.heroImage && typeof post.heroImage !== 'number' && (
+          {post.heroImage && typeof post.heroImage !== 'number' && post.heroImage.url && (
             <Image
               src={post.heroImage.url}
               alt={post.title}
