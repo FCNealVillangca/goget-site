@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useCallback } from 'react'
 import { useField, toast } from '@payloadcms/ui'
 
@@ -32,30 +34,18 @@ const CustomUploadField: React.FC<any> = (props) => {
 
       const cloudinaryResult = await response.json()
 
-      // Now create the Payload media record with just metadata (no file data)
-      const payloadResponse = await fetch('/api/media', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          filename: cloudinaryResult.public_id,
-          mimeType: `${cloudinaryResult.resource_type}/${cloudinaryResult.format}`,
-          filesize: cloudinaryResult.bytes,
-          url: cloudinaryResult.secure_url,
-          alt: file.name,
-        }),
-      })
-
-      if (!payloadResponse.ok) {
-        throw new Error('Failed to create media record')
+      // Update the filename field with Cloudinary public_id
+      // Payload will handle the rest since this is an upload collection
+      if (props.onChange) {
+        props.onChange(cloudinaryResult.public_id)
       }
 
-      const payloadResult = await payloadResponse.json()
-
-      // Set the media ID in the form
-      if (props.onChange) {
-        props.onChange(payloadResult.doc.id)
+      // Also update other fields if they exist in the form
+      if (props.form) {
+        if (props.form.setFieldValue && typeof props.form.setFieldValue === 'function') {
+          props.form.setFieldValue('filesize', cloudinaryResult.bytes)
+          props.form.setFieldValue('mimeType', `${cloudinaryResult.resource_type}/${cloudinaryResult.format}`)
+        }
       }
 
       toast.success('File uploaded successfully')

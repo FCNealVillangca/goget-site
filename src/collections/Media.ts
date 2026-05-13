@@ -27,21 +27,32 @@ export const Media: CollectionConfig = {
     disableLocalStorage: true,
     adminThumbnail: ({ doc }) => {
       // Use Cloudinary URL for thumbnails
-      if (doc?.filename) {
-        return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/w_150,h_150,c_fill,q_auto,f_auto/media/${doc.filename}.jpg`
+      if (doc?.filename && typeof doc.filename === 'string') {
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+        const filename = doc.filename
+
+        // Check if it's a video file
+        if (filename.includes('.mp4') || filename.includes('.mov') || filename.includes('.avi') || filename.includes('.webm')) {
+          // For videos, generate a thumbnail from the first frame
+          return `https://res.cloudinary.com/${cloudName}/video/upload/so_0,w_150,h_150,c_fill,q_auto,f_jpg/media/${filename.replace(/\.[^/.]+$/, '')}`
+        } else {
+          // For images, use regular image transformations
+          return `https://res.cloudinary.com/${cloudName}/image/upload/w_150,h_150,c_fill,q_auto,f_auto/media/${filename}`
+        }
       }
       return null
     },
   },
-  admin: {
-    components: {
-      // Override the upload field component
-      edit: {
-        Upload: '@/components/CustomUpload',
+  fields: [
+    {
+      name: 'filename',
+      type: 'text',
+      admin: {
+        components: {
+          Field: '@/components/CustomUpload',
+        },
       },
     },
-  },
-  fields: [
     {
       name: 'alt',
       type: 'text',

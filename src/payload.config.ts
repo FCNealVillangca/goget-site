@@ -40,9 +40,17 @@ const cloudinaryAdapter = () => ({
     req,
     clientUploadContext,
   }: Parameters<HandleUpload>[0]) {
-    // If filename already looks like a Cloudinary public_id (contains 'media/'), skip upload
+    // If filename already contains 'media/', it's already uploaded to Cloudinary
     if (file.filename && file.filename.includes('media/')) {
-      // File already uploaded to Cloudinary, just ensure URL generation works
+      // File already uploaded to Cloudinary via client-side upload
+      // Just set the metadata from the existing data
+      if (data?.filesize) file.filesize = data.filesize
+      if (data?.mimeType) file.mimeType = data.mimeType
+      return
+    }
+
+    // If there's no file buffer, skip upload (client-side upload)
+    if (!file.buffer || file.buffer.length === 0) {
       return
     }
 
