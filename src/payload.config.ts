@@ -48,6 +48,7 @@ const cloudinaryAdapter = () => ({
             public_id: `media/${file.filename.replace(/\.[^/.]+$/, '')}`,
             overwrite: false,
             use_filename: true,
+            timeout: 120000, // 2 minute timeout for large files
           },
           (error, result) => {
             if (error) return reject(error)
@@ -62,6 +63,7 @@ const cloudinaryAdapter = () => ({
       file.filesize = uploadResult.bytes
     } catch (err) {
       console.error('Upload Error', err)
+      throw new Error(`Cloudinary upload failed: ${err instanceof Error ? err.message : String(err)}`)
     }
   },
 
@@ -95,6 +97,11 @@ export default buildConfig({
         { label: 'Tablet', name: 'tablet', width: 768, height: 1024 },
         { label: 'Desktop', name: 'desktop', width: 1440, height: 900 },
       ],
+    },
+  },
+  upload: {
+    limits: {
+      fileSize: 100 * 1024 * 1024, // 100MB limit
     },
   },
   editor: defaultLexical,

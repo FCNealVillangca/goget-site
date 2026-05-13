@@ -23,6 +23,18 @@ export const Media: CollectionConfig = {
     read: anyone,
     update: authenticated,
   },
+  admin: {
+    components: {
+      // Override the default upload field with custom client-side upload
+      edit: {
+        Upload: '@/components/CustomUpload',
+      },
+    },
+  },
+  upload: {
+    // Disable server-side processing since we handle uploads client-side
+    disableLocalStorage: true,
+  },
   fields: [
     {
       name: 'alt',
