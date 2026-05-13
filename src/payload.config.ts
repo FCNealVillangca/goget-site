@@ -3,7 +3,10 @@ import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
-import { cloudinaryStorage } from 'payload-cloudinary' // 1. Import the plugin
+import { cloudStoragePlugin } from '@payloadcms/plugin-cloud-storage'
+import { v2 as cloudinary } from 'cloudinary'
+import type { HandleUpload, HandleDelete } from '@payloadcms/plugin-cloud-storage/types'
+import type { UploadApiResponse } from 'cloudinary'
 
 import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
@@ -21,6 +24,60 @@ import { getServerSideURL } from './utilities/getURL'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
+
+const cloudinaryAdapter = () => ({
+  name: 'cloudinary-adapter',
+  async handleUpload({
+    file,
+    collection,
+    data,
+    req,
+    clientUploadContext,
+  }: Parameters<HandleUpload>[0]) {
+    try {
+      const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            resource_type: 'auto',
+            public_id: `media/${file.filename.replace(/\.[^/.]+$/, '')}`,
+            overwrite: false,
+            use_filename: true,
+          },
+          (error, result) => {
+            if (error) return reject(error)
+            if (!result) return reject(new Error('No result returned from Cloudinary'))
+            resolve(result)
+          },
+        )
+        uploadStream.end(file.buffer)
+      })
+      file.filename = uploadResult.public_id
+      file.mimeType = `${uploadResult.format}`
+      file.filesize = uploadResult.bytes
+    } catch (err) {
+      console.error('Upload Error', err)
+    }
+  },
+
+  async handleDelete({ collection, doc, filename, req }: Parameters<HandleDelete>[0]) {
+    console.log('handleDelete has been called')
+
+    try {
+      await cloudinary.uploader.destroy(`media/${filename.replace(/\.[^/.]+$/, '')}`)
+    } catch (error) {
+      console.error('Cloudinary Delete Error:', error)
+    }
+  },
+  staticHandler() {
+    return new Response('Not implemented', { status: 501 })
+  },
+})
 
 export default buildConfig({
   admin: {
@@ -51,17 +108,17 @@ export default buildConfig({
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
 
-  // 2. Add Cloudinary to your plugins array
   plugins: [
-    ...existingPlugins, // Keep your current plugins
-    cloudinaryStorage({
-      config: {
-        cloud_name: process.env.CLOUDINARY_NAME!, // Add the ! here
-        api_key: process.env.CLOUDINARY_API_KEY!, // And here
-        api_secret: process.env.CLOUDINARY_API_SECRET!, // And here
-      },
+    ...existingPlugins,
+    cloudStoragePlugin({
       collections: {
-        media: true,
+        media: {
+          adapter: cloudinaryAdapter,
+          disableLocalStorage: true,
+          generateFileURL: ({ filename }) => {
+            return cloudinary.url(`media/${filename}`, { secure: true })
+          },
+        },
       },
     }),
   ],

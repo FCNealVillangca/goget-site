@@ -7,6 +7,7 @@ import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
 import RichText from '@/components/RichText'
+import Image from 'next/image' // Import next/image for static image usage
 
 import type { Post } from '@/payload-types'
 
@@ -41,10 +42,11 @@ type Args = {
   }>
 }
 
+// ... existing imports
+
 export default async function Post({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
-  // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/posts/' + decodedSlug
   const post = await queryPostBySlug({ slug: decodedSlug })
@@ -54,20 +56,37 @@ export default async function Post({ params: paramsPromise }: Args) {
   return (
     <article className="pb-16">
       <PageClient />
-
-      {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
-
       {draft && <LivePreviewListener />}
 
-      <PostHero post={post} />
+      {/* MATCHES FOOTER EXACTLY: max-w-7xl + px-4 */}
+      <div className="max-w-7xl mx-auto px-4">
+        <header className="pt-12 mb-8">
+          <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4">
+            {post.title}
+          </h1>
+        </header>
 
-      <div className="flex flex-col items-center gap-4 pt-8">
-        <div className="container">
-          <RichText className="max-w-[48rem] mx-auto" data={post.content} enableGutter={false} />
+        {/* 3:2 Image - Fills the width of the 7xl container */}
+        <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl mb-12">
+          {post.heroImage && typeof post.heroImage !== 'number' && (
+            <Image
+              src={post.heroImage.url}
+              alt={post.title}
+              fill
+              className="object-cover"
+              priority
+            />
+          )}
+        </div>
+
+        {/* Content Container - No extra max-w-prose to avoid shrinking */}
+        <div className="w-full">
+          <RichText data={post.content} enableGutter={false} />
+
           {post.relatedPosts && post.relatedPosts.length > 0 && (
             <RelatedPosts
-              className="mt-12 max-w-[52rem] lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
+              className="mt-12"
               docs={post.relatedPosts.filter((post) => typeof post === 'object')}
             />
           )}

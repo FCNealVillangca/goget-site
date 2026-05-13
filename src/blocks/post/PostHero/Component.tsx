@@ -16,7 +16,7 @@ export const PostHero: React.FC<{
           <Media
             resource={heroImage}
             fill
-            className="object-cover opacity-60 transition-transform duration-700 hover:scale-105"
+            className="object-contain object-center opacity-80 transition-transform duration-700 hover:scale-105"
             priority
           />
         ) : (
@@ -32,7 +32,7 @@ export const PostHero: React.FC<{
           </div>
         )}
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-950 via-white/20 dark:via-slate-950/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-white/60 dark:from-slate-950/60 via-transparent to-transparent" />
       </div>
 
       {/* Content */}
@@ -81,12 +81,14 @@ export const PostHero: React.FC<{
             </div>
             <div>
               <p className="text-sm font-bold text-slate-900 dark:text-white">GoGet Team</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">French Education Specialists</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                French Education Specialists
+              </p>
             </div>
           </div>
         </div>
       </div>
-      
+
       {/* Decorative Elements */}
       <div className="absolute bottom-0 left-0 h-32 w-full bg-gradient-to-t from-white dark:from-slate-950 to-transparent z-10" />
     </div>

@@ -92,14 +92,16 @@ const HomeStruggle: React.FC<Props> = ({
                       {service.description}
                     </p>
                   </div>
-                ) : (
-                  <div className="relative w-full h-full">
-                    <img
-                      src={imageUrl}
-                      alt={service.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent"></div>
+                 ) : (
+                   <div className="relative w-full h-full">
+                     {imageUrl && (
+                       <img
+                         src={imageUrl}
+                         alt={service.title}
+                         className="w-full h-full object-cover"
+                       />
+                     )}
+                     <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white flex justify-between items-end md:block">
                       <h3 className="text-base md:text-xl font-bold truncate pr-4">
                         {service.title}
