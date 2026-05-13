@@ -60,10 +60,18 @@ export const seed = async ({
       'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/3.x/templates/website/src/endpoints/seed/image-hero1.webp',
     )
 
+    // Since we're using client-side uploads only, create media record with placeholder data
+    // In production, files would be uploaded via the admin interface
     const heroDoc = await payload.create({
       collection: 'media',
-      data: { alt: 'French Lessons Hero Image' },
-      file: heroBuffer,
+      data: {
+        filename: 'hero-placeholder',
+        url: 'https://images.unsplash.com/photo-1499566727022-8ccb1bf82098?w=1600&q=80',
+        mimeType: 'image/jpeg',
+        filesize: 100000,
+        alt: 'French Lessons Hero Image'
+      },
+      draft: false,
     })
 
     let homeDocRecord

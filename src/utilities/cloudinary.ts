@@ -1,32 +1,52 @@
 export const getCloudinaryUrl = (doc: any, options?: { width?: number; height?: number; quality?: string; format?: string }) => {
-  if (!doc?.filename) return null
+  if (!doc?.url) return null
 
-  const { width, height, quality = 'auto', format } = options || {}
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+  // If we have the direct URL, use it (for images)
+  if (doc.url && (!doc.mimeType || doc.mimeType?.startsWith('image/'))) {
+    return doc.url
+  }
 
-  let transformations = []
+  // Fallback to constructing URL from filename if needed
+  if (doc.filename) {
+    const { width, height, quality = 'auto', format } = options || {}
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
 
-  if (width) transformations.push(`w_${width}`)
-  if (height) transformations.push(`h_${height}`)
-  if (quality) transformations.push(`q_${quality}`)
-  if (format) transformations.push(`f_${format}`)
+    let transformations = []
 
-  const transformationString = transformations.length > 0 ? transformations.join(',') + '/' : ''
+    if (width) transformations.push(`w_${width}`)
+    if (height) transformations.push(`h_${height}`)
+    if (quality) transformations.push(`q_${quality}`)
+    if (format) transformations.push(`f_${format}`)
 
-  return `https://res.cloudinary.com/${cloudName}/image/upload/${transformationString}media/${doc.filename}`
+    const transformationString = transformations.length > 0 ? transformations.join(',') + '/' : ''
+
+    return `https://res.cloudinary.com/${cloudName}/image/upload/${transformationString}media/${doc.filename}`
+  }
+
+  return null
 }
 
 export const getCloudinaryVideoUrl = (doc: any, options?: { quality?: string; format?: string }) => {
-  if (!doc?.filename) return null
+  if (!doc?.url) return null
 
-  const { quality = 'auto', format } = options || {}
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+  // If we have the direct URL, use it (for videos)
+  if (doc.url && doc.mimeType?.startsWith('video/')) {
+    return doc.url
+  }
 
-  let transformations = []
-  if (quality) transformations.push(`q_${quality}`)
-  if (format) transformations.push(`f_${format}`)
+  // Fallback to constructing URL from filename if needed
+  if (doc.filename) {
+    const { quality = 'auto', format } = options || {}
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
 
-  const transformationString = transformations.length > 0 ? transformations.join(',') + '/' : ''
+    let transformations = []
+    if (quality) transformations.push(`q_${quality}`)
+    if (format) transformations.push(`f_${format}`)
 
-  return `https://res.cloudinary.com/${cloudName}/video/upload/${transformationString}media/${doc.filename}`
+    const transformationString = transformations.length > 0 ? transformations.join(',') + '/' : ''
+
+    return `https://res.cloudinary.com/${cloudName}/video/upload/${transformationString}media/${doc.filename}`
+  }
+
+  return null
 }

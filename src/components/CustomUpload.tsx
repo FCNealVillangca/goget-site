@@ -1,9 +1,12 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { useField, toast } from '@payloadcms/ui'
+import { FieldComponent, useForm, toast } from '@payloadcms/ui'
 
-const CustomUploadField: React.FC<any> = (props) => {
+const CustomUploadField: FieldComponent = ({ name, path, value, setValue, field }) => {
+  console.log('🎬 CustomUploadField mounted with props:', { name, path, value: !!value, field: !!field })
+
+  const { dispatchFields } = useForm()
   const [uploading, setUploading] = useState(false)
 
   const handleFileSelect = useCallback(async (files: FileList | null) => {
@@ -13,40 +16,74 @@ const CustomUploadField: React.FC<any> = (props) => {
     setUploading(true)
 
     try {
+      console.log('🎬 Starting Cloudinary upload for:', file.name, 'Size:', file.size, 'Type:', file.type)
+
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'media_upload'
+
+      console.log('📡 Cloudinary config:', { cloudName, uploadPreset })
+
       // Upload directly to Cloudinary from client
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'media_upload')
+      formData.append('upload_preset', uploadPreset)
       formData.append('folder', 'media')
       formData.append('resource_type', 'auto')
 
+      console.log('📤 Sending to Cloudinary URL:', `https://api.cloudinary.com/v1_1/${cloudName}/upload`)
+
       const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
+        `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
         {
           method: 'POST',
           body: formData,
         }
       )
 
+      console.log('📥 Cloudinary response status:', response.status)
+
       if (!response.ok) {
-        throw new Error(`Cloudinary upload failed: ${response.statusText}`)
+        const errorText = await response.text()
+        console.error('❌ Cloudinary upload failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+          headers: Object.fromEntries(response.headers.entries())
+        })
+
+        // If preset not found, suggest creating it
+        if (response.status === 400 && errorText.includes('Upload preset not found')) {
+          console.error('🚨 SOLUTION: Create upload preset "media_upload" in Cloudinary dashboard!')
+          console.error('   Go to: https://cloudinary.com/console/settings/upload')
+          console.error('   Name: media_upload, Mode: Unsigned')
+        }
+
+        throw new Error(`Cloudinary upload failed: ${response.status} ${errorText}`)
       }
 
       const cloudinaryResult = await response.json()
+      console.log('✅ Cloudinary upload success:', {
+        public_id: cloudinaryResult.public_id,
+        secure_url: cloudinaryResult.secure_url,
+        format: cloudinaryResult.format,
+        bytes: cloudinaryResult.bytes
+      })
 
-      // Update the filename field with Cloudinary public_id
-      // Payload will handle the rest since this is an upload collection
-      if (props.onChange) {
-        props.onChange(cloudinaryResult.public_id)
-      }
+      // Update the Media fields with Cloudinary result
+      console.log('📝 Updating Media fields with Cloudinary result...')
+      dispatchFields({ type: 'UPDATE', path: 'filename', value: cloudinaryResult.public_id })
+      dispatchFields({ type: 'UPDATE', path: 'url', value: cloudinaryResult.secure_url })
+      dispatchFields({ type: 'UPDATE', path: 'filesize', value: cloudinaryResult.bytes })
 
-      // Also update other fields if they exist in the form
-      if (props.form) {
-        if (props.form.setFieldValue && typeof props.form.setFieldValue === 'function') {
-          props.form.setFieldValue('filesize', cloudinaryResult.bytes)
-          props.form.setFieldValue('mimeType', `${cloudinaryResult.resource_type}/${cloudinaryResult.format}`)
-        }
-      }
+      // Set mimeType based on format
+      let mimeType = 'application/octet-stream'
+      if (cloudinaryResult.format === 'mp4') mimeType = 'video/mp4'
+      else if (cloudinaryResult.format === 'jpg' || cloudinaryResult.format === 'jpeg') mimeType = 'image/jpeg'
+      else if (cloudinaryResult.format === 'png') mimeType = 'image/png'
+      else if (cloudinaryResult.format === 'gif') mimeType = 'image/gif'
+      dispatchFields({ type: 'UPDATE', path: 'mimeType', value: mimeType })
+
+      console.log('✅ Media fields updated')
 
       toast.success('File uploaded successfully')
     } catch (error: any) {
@@ -55,7 +92,7 @@ const CustomUploadField: React.FC<any> = (props) => {
     } finally {
       setUploading(false)
     }
-  }, [props])
+  }, [dispatchFields])
 
   return (
     <div>

@@ -301,6 +301,10 @@ export interface Post {
  */
 export interface Media {
   id: number;
+  filename?: string | null;
+  url?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
   alt?: string | null;
   caption?: {
     root: {
@@ -320,15 +324,6 @@ export interface Media {
   folder?: (number | null) | FolderInterface;
   updatedAt: string;
   createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1572,20 +1567,15 @@ export interface PostsSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  filename?: T;
+  url?: T;
+  mimeType?: T;
+  filesize?: T;
   alt?: T;
   caption?: T;
   folder?: T;
   updatedAt?: T;
   createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
