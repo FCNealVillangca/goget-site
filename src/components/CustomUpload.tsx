@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { FieldComponent, useForm, toast } from '@payloadcms/ui'
+import { useForm, toast } from '@payloadcms/ui'
 
-const CustomUploadField: FieldComponent = ({ name, path, value, setValue, field }) => {
+const CustomUploadField: React.FC<any> = ({ name, path, value, setValue, field }) => {
   console.log('🎬 CustomUploadField mounted with props:', { name, path, value: !!value, field: !!field })
 
   const { dispatchFields } = useForm()
